@@ -661,22 +661,22 @@ def get_piece_value(piece):
         'red_soldier2': 10,
         'red_soldier3': 10,
         'red_soldier4': 10,
-        'black_chariot': -50,
-        'black_chariot1': -50,
-        'black_horse': -30,
-        'black_horse1': -30,
-        'black_elephant': -20,
-        'black_elephant1': -20,
-        'black_advisor': -10,
-        'black_advisor1': -10,
-        'black_cannon': -20,
-        'black_cannon1': -20,
-        'black_general': -100,
-        'black_soldier': -10,
-        'black_soldier1': -10,
-        'black_soldier2': -10,
-        'black_soldier3': -10,
-        'black_soldier4': -10
+        'black_chariot': 50,
+        'black_chariot1': 50,
+        'black_horse': 30,
+        'black_horse1': 30,
+        'black_elephant': 20,
+        'black_elephant1': 20,
+        'black_advisor': 10,
+        'black_advisor1': 10,
+        'black_cannon': 20,
+        'black_cannon1': 20,
+        'black_general': 100,
+        'black_soldier': 10,
+        'black_soldier1': 10,
+        'black_soldier2': 10,
+        'black_soldier3': 10,
+        'black_soldier4': 10
     }
 
     return piece_values[piece]
@@ -707,7 +707,7 @@ def minimax(map, depth, maximizingPlayer, alpha, beta):
                     if beta <= alpha:
                         flag = True
                         break
-            if flag: break
+            # if flag: break
         return [maxEval,bestMove,pickedPiece]
     else:
         minEval = inf
@@ -732,7 +732,7 @@ def minimax(map, depth, maximizingPlayer, alpha, beta):
                     if beta <= alpha:
                         flag = True
                         break
-            if flag: break
+            # if flag: break
         return [minEval,bestMove,pickedPiece]
 
 
