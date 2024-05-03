@@ -620,7 +620,7 @@ def end_game_question(turn, x, y):
     if yes.get_rect(topleft = (735, 130)).collidepoint(x, y): return True
     if no.get_rect(topleft = (875, 130)).collidepoint(x, y): sys.exit()
 
-def evaluate(map,maximizingPlayer) -> float:
+def evaluate(map,maximizingPlayer):
     """
     Evaluate the current state of the game board.
     """
@@ -681,13 +681,15 @@ def get_piece_value(piece):
 
     return piece_values[piece]
 
-def minimax(map, depth, maximizingPlayer, alpha=-inf, beta=inf):
+def minimax(map, depth, maximizingPlayer, alpha, beta):
     if depth == 0 or end_game(map, turn):
-        return [evaluate(map,maximizingPlayer),None]
+        return [evaluate(map,maximizingPlayer),None,None]
+    
     if maximizingPlayer:
         maxEval = -inf
         bestMove = None
         pickedPiece = None
+        flag = False
         for piece in player(turn):
             if on_board(piece, map):
                 i, j = get_ij(piece, map)
@@ -695,34 +697,44 @@ def minimax(map, depth, maximizingPlayer, alpha=-inf, beta=inf):
                 for move in moves:
                     new_map = copy.deepcopy(map)
                     make_move(piece, move, new_map)
-                    eval = minimax(new_map, depth - 1, False,alpha,beta)
+                    eval = minimax(new_map, depth - 1, not maximizingPlayer ,alpha,beta)
+
                     alpha = max(alpha, eval[0])
+
                     if beta <= alpha:
+                        flag = True
                         break
                     if eval[0] >= maxEval:
                         maxEval = eval[0]
                         bestMove = move
                         pickedPiece = piece
+            if flag: break
         return [maxEval,bestMove,pickedPiece]
     else:
         minEval = inf
         bestMove = None
         pickedPiece = None
+        flag = False
         for piece in player(turn):
             if on_board(piece, map):
                 i, j = get_ij(piece, map)
                 moves = possible_moves(piece, i, j, map)
+                
                 for move in moves:
                     new_map = copy.deepcopy(map)
                     make_move(piece, move, new_map)
-                    eval = minimax(new_map, depth - 1, True,alpha,beta)
+                    eval = minimax(new_map, depth - 1,not maximizingPlayer,alpha,beta)
+
                     beta = min(beta, eval[0])
+
                     if beta <= alpha:
+                        flag = True
                         break
                     if eval[0] <= minEval:
                         minEval = eval[0]
                         bestMove = move
                         pickedPiece = piece
+            if flag: break
         return [minEval,bestMove,pickedPiece]
 
 
@@ -779,7 +791,7 @@ while True:
             sys.exit()
 
         if player(turn) == black_pieces:
-            eval = minimax(map, 3, False)
+            eval = minimax(map, 10, False, -inf, inf)
             move = eval[1]
             piece = eval[2]
             print(move)
