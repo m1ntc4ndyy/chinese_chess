@@ -1,5 +1,5 @@
 import pygame, sys, copy, pathlib
-
+from math import inf
 # Load possible moves pointer
 dot = pygame.image.load(pathlib.Path.cwd() / "images" / "move.png")
 active = pygame.image.load(pathlib.Path.cwd() / "images" / "active.png")
