@@ -620,6 +620,111 @@ def end_game_question(turn, x, y):
     if yes.get_rect(topleft = (735, 130)).collidepoint(x, y): return True
     if no.get_rect(topleft = (875, 130)).collidepoint(x, y): sys.exit()
 
+def evaluate(map,maximizingPlayer) -> float:
+    """
+    Evaluate the current state of the game board.
+    """
+    red_score = 0
+    black_score = 0
+
+    for i in range(10):
+        for j in range(9):
+            piece = map[i][j]
+            if piece in red_pieces:
+                red_score += get_piece_value(piece)
+            elif piece in black_pieces:
+                black_score += get_piece_value(piece)
+
+    if maximizingPlayer:
+        return red_score - black_score
+    else:
+        return black_score - red_score
+
+def get_piece_value(piece):
+    """
+    Get the value of a piece.
+    """
+    piece_values = {
+        'red_chariot': 50,
+        'red_chariot1': 50,
+        'red_horse': 30,
+        'red_horse1': 30,
+        'red_elephant': 20,
+        'red_elephant1': 20,
+        'red_advisor': 10,
+        'red_advisor1': 10,
+        'red_cannon': 20,
+        'red_cannon1': 20,
+        'red_general': 100,
+        'red_soldier': 10,
+        'red_soldier1': 10,
+        'red_soldier2': 10,
+        'red_soldier3': 10,
+        'red_soldier4': 10,
+        'black_chariot': -50,
+        'black_chariot1': -50,
+        'black_horse': -30,
+        'black_horse1': -30,
+        'black_elephant': -20,
+        'black_elephant1': -20,
+        'black_advisor': -10,
+        'black_advisor1': -10,
+        'black_cannon': -20,
+        'black_cannon1': -20,
+        'black_general': -100,
+        'black_soldier': -10,
+        'black_soldier1': -10,
+        'black_soldier2': -10,
+        'black_soldier3': -10,
+        'black_soldier4': -10
+    }
+
+    return piece_values[piece]
+
+def minimax(map, depth, maximizingPlayer, alpha=-inf, beta=inf):
+    if depth == 0 or end_game(map, turn):
+        return [evaluate(map,maximizingPlayer),None]
+    if maximizingPlayer:
+        maxEval = -inf
+        bestMove = None
+        pickedPiece = None
+        for piece in player(turn):
+            if on_board(piece, map):
+                i, j = get_ij(piece, map)
+                moves = possible_moves(piece, i, j, map)
+                for move in moves:
+                    new_map = copy.deepcopy(map)
+                    make_move(piece, move, new_map)
+                    eval = minimax(new_map, depth - 1, False,alpha,beta)
+                    alpha = max(alpha, eval[0])
+                    if beta <= alpha:
+                        break
+                    if eval[0] >= maxEval:
+                        maxEval = eval[0]
+                        bestMove = move
+                        pickedPiece = piece
+        return [maxEval,bestMove,pickedPiece]
+    else:
+        minEval = inf
+        bestMove = None
+        pickedPiece = None
+        for piece in player(turn):
+            if on_board(piece, map):
+                i, j = get_ij(piece, map)
+                moves = possible_moves(piece, i, j, map)
+                for move in moves:
+                    new_map = copy.deepcopy(map)
+                    make_move(piece, move, new_map)
+                    eval = minimax(new_map, depth - 1, True,alpha,beta)
+                    beta = min(beta, eval[0])
+                    if beta <= alpha:
+                        break
+                    if eval[0] <= minEval:
+                        minEval = eval[0]
+                        bestMove = move
+                        pickedPiece = piece
+        return [minEval,bestMove,pickedPiece]
+
 
 # Initialize pygame
 pygame.init()
@@ -672,6 +777,16 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
+
+        if player(turn) == black_pieces:
+            eval = minimax(map, 3, False)
+            move = eval[1]
+            piece = eval[2]
+            print(move)
+            print(piece)
+            make_move(piece, move, map)
+            render_game(map)
+            turn += 1
 
         # Listen to mouse click event
         if event.type == pygame.MOUSEBUTTONDOWN:
