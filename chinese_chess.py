@@ -698,16 +698,15 @@ def minimax(map, depth, maximizingPlayer, alpha, beta):
                     new_map = copy.deepcopy(map)
                     make_move(piece, move, new_map)
                     eval = minimax(new_map, depth - 1, not maximizingPlayer ,alpha,beta)
-
+                    if eval[0] >= maxEval:
+                        maxEval = eval[0]
+                        bestMove = move
+                        pickedPiece = piece
                     alpha = max(alpha, eval[0])
 
                     if beta <= alpha:
                         flag = True
                         break
-                    if eval[0] >= maxEval:
-                        maxEval = eval[0]
-                        bestMove = move
-                        pickedPiece = piece
             if flag: break
         return [maxEval,bestMove,pickedPiece]
     else:
@@ -724,16 +723,15 @@ def minimax(map, depth, maximizingPlayer, alpha, beta):
                     new_map = copy.deepcopy(map)
                     make_move(piece, move, new_map)
                     eval = minimax(new_map, depth - 1,not maximizingPlayer,alpha,beta)
-
-                    beta = min(beta, eval[0])
-
-                    if beta <= alpha:
-                        flag = True
-                        break
                     if eval[0] <= minEval:
                         minEval = eval[0]
                         bestMove = move
                         pickedPiece = piece
+
+                    beta = min(beta, eval[0])
+                    if beta <= alpha:
+                        flag = True
+                        break
             if flag: break
         return [minEval,bestMove,pickedPiece]
 
@@ -791,7 +789,7 @@ while True:
             sys.exit()
 
         if player(turn) == black_pieces:
-            eval = minimax(map, 10, False, -inf, inf)
+            eval = minimax(map, 3, False, -inf, inf)
             move = eval[1]
             piece = eval[2]
             print(move)
